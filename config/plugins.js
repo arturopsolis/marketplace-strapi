@@ -4,7 +4,7 @@ module.exports = ({ env }) => ({
       jwtSecret: env("JWT_SECRET"),
     },
   },
-  upload: {
+  /* upload: {
     config: {
       provider: "cloudinary",
       providerOptions: {
@@ -17,7 +17,7 @@ module.exports = ({ env }) => ({
         delete: {},
       },
     },
-  },
+  }, */
   email: {
     config: {
       provider: "sendgrid",
@@ -25,9 +25,9 @@ module.exports = ({ env }) => ({
         apiKey: env("SENDGRID_API_KEY"),
       },
       settings: {
-        defaultFrom: "arturopsolis™gmail.com",
-        defaultReplyTo: "arturopsolis™gmail.com",
-        testAddress: "arturopsolis™gmail.com",
+        defaultFrom: "no-reply@somnum.net",
+        defaultReplyTo: "no-reply@somnum.net",
+        testAddress: "no-reply@somnum.net",
       },
     },
   },
