@@ -462,6 +462,7 @@ export interface ApiOrderOrder extends Struct.CollectionTypeSchema {
       'api::order-item.order-item'
     >;
     phoneNumber: Schema.Attribute.String;
+    productItems: Schema.Attribute.JSON;
     publishedAt: Schema.Attribute.DateTime;
     state: Schema.Attribute.String;
     total: Schema.Attribute.Decimal;
