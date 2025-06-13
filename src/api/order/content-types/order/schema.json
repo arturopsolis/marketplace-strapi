@@ -32,19 +32,15 @@
     "total": {
       "type": "decimal"
     },
-    "items": {
-      "type": "json"
-    },
     "customer": {
       "type": "relation",
       "relation": "oneToOne",
       "target": "api::customer.customer"
     },
-    "products": {
+    "order_items": {
       "type": "relation",
-      "relation": "manyToMany",
-      "target": "api::product.product",
-      "inversedBy": "orders"
+      "relation": "oneToMany",
+      "target": "api::order-item.order-item"
     }
   }
 }
