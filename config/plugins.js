@@ -25,9 +25,9 @@ module.exports = ({ env }) => ({
         apiKey: env("SENDGRID_API_KEY"),
       },
       settings: {
-        defaultFrom: "arturo@somnum.net",
-        defaultReplyTo: "arturo@somnum.net",
-        testAddress: "arturo@somnum.net",
+        defaultFrom: "no-reply@corazolana.com",
+        defaultReplyTo: "knitboxing@corazolana.com",
+        testAddress: "knitboxing@corazolana.com",
       },
     },
   },

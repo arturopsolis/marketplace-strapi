@@ -1,8 +1,15 @@
 // path: src/api/order/content-types/order/lifecycles.js
-const sendEmail = require("../../../../utils/sendEmail");
 
 module.exports = {
   async afterCreate(event) {
+    // Función para formatear dinero con comas
+    function formatMoney(num) {
+      if (typeof num === "number") {
+        return "$" + num.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+      }
+      return "$0.00";
+    }
+
     const {
       result,
       params: { data: requestData },
@@ -44,14 +51,22 @@ module.exports = {
           },
         });
 
-        // Generamos la fila HTML
+        // Generamos la fila HTML con estilo Corazolana
         const subtotal = item.quantity * product.price;
         rows.push(`
           <tr>
-            <td>${product.name}</td>
-            <td style="text-align:center;">${item.quantity}</td>
-            <td style="text-align:right;">$${product.price.toFixed(2)}</td>
-            <td style="text-align:right;">$${subtotal.toFixed(2)}</td>
+            <td style="text-align:left; border-top: 1px solid #dee2e6; padding: 8px;">
+              ${product.name}
+            </td>
+            <td style="text-align:center; border-top: 1px solid #dee2e6; padding: 8px;">
+              ${item.quantity}
+            </td>
+            <td style="text-align:right; border-top: 1px solid #dee2e6; padding: 8px;">
+              ${formatMoney(product.price)}
+            </td>
+            <td style="text-align:right; border-top: 1px solid #dee2e6; padding: 8px;">
+              ${formatMoney(subtotal)}
+            </td>
           </tr>
         `);
       } catch (error) {
@@ -59,14 +74,22 @@ module.exports = {
       }
     }
 
-    // 2) Traer datos básicos de la orden
+    // 2) Traer datos completos de la orden
     let orderData;
     try {
       orderData = await strapi.entityService.findOne(
         "api::order.order",
         orderId,
         {
-          fields: ["customerName", "customerEmail", "phoneNumber", "total"],
+          fields: [
+            "customerName",
+            "customerEmail",
+            "phoneNumber",
+            "address",
+            "state",
+            "zipCode",
+            "total",
+          ],
         },
       );
     } catch (error) {
@@ -74,44 +97,96 @@ module.exports = {
       return;
     }
 
-    // 3) Construir el HTML del correo
-    const html = `
-      <h2>🧾 Pedido #${orderId}</h2>
-      <p><strong>Cliente:</strong> ${orderData.customerName}</p>
-      <p><strong>Email:</strong> ${orderData.customerEmail}</p>
-      <p><strong>Teléfono:</strong> ${orderData.phoneNumber}</p>
-      <br/>
-      <table width="100%" border="0" style="border-collapse: collapse; background-color:#f9f9f9;">
-        <thead>
-          <tr>
-            <th style="text-align:left;">Producto</th>
-            <th style="text-align:center;">Cantidad</th>
-            <th style="text-align:right;">Precio</th>
-            <th style="text-align:right;">Subtotal</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${rows.join("")}
-          <tr>
-            <td colspan="3" style="text-align:right;"><strong>Total:</strong></td>
-            <td style="text-align:right;"><strong>$${(
-              orderData.total || 0
-            ).toFixed(2)}</strong></td>
-          </tr>
-        </tbody>
+    // 3) Construir tabla HTML
+    const tableStr = `
+      <table border="0" style="border-collapse: collapse; border: 1px solid #dee2e6; margin: 30px auto; text-align: left;">
+        <tr>
+          <th style="text-align:left; padding:8px">Producto</th>
+          <th style="text-align:center; padding:8px">Cantidad</th>
+          <th style="text-align:right; padding:8px">Precio</th>
+          <th style="text-align:right; padding:8px">Subtotal</th>
+        </tr>
+        ${rows.join("")}
       </table>
-      <p style="margin-top:20px;">Gracias por tu compra 🙌</p>
     `;
 
-    // 4) Enviar el correo
+    // 4) Template HTML estilo Corazolana con logo de KnitBoxing
+    const htmlTemplate = `
+      <img
+        src="http://corazolana.com/media/images/knitboxing-logo.png"
+        style="
+          display: block;
+          position: relative;
+          width: 150px;
+          margin: 30px auto;
+          text-transform: upper;
+        "
+      />
+      <p style="
+        font-size: 22px;
+        display: block;
+        width: 100%;
+        max-width: 600px;
+        margin: 15px auto;
+        text-align: center;
+        margin-bottom: 30px;
+      ">
+        <strong>¡Hola ${orderData.customerName}!</strong>
+      </p>
+
+      <p style="
+        font-size: 16px;
+        display: block;
+        width: 100%;
+        max-width: 600px;
+        margin: 15px auto;
+        text-align: left;
+        margin-bottom: 30px;
+      ">
+        Pronto nos pondremos en contacto contigo por WhatsApp para
+        confirmar tu pedido.
+        <strong>Agradecemos mucho tu preferencia.</strong>
+        <br /><br />
+        Estado: ${orderData.state || "No especificado"}
+        <br />
+        Teléfono: ${orderData.phoneNumber}<br />
+        Email: ${orderData.customerEmail}<br />
+        Dirección: ${orderData.address || "No especificada"}<br />
+        C.P.: ${orderData.zipCode || "No especificado"}<br />
+      </p>
+      ${tableStr}
+      <p style="text-align: center; font-size: 20px">
+        <strong>TOTAL: ${formatMoney(orderData.total)}</strong>
+      </p>
+      <p style="
+        font-size: 16px;
+        display: block;
+        width: 100%;
+        max-width: 600px;
+        margin: 15px auto;
+        text-align: center;
+        margin-bottom: 30px;
+      ">
+        (Pedido sujeto a existencias) <br />
+        Te mandamos un gran abrazo 💜
+      </p>
+    `;
+
+    // 5) Enviar el correo
     try {
-      await sendEmail({
-        to: orderData.customerEmail,
-        subject: `🧾 Confirmación de pedido #${orderId}`,
-        html,
+      await strapi.plugins["email"].services.email.send({
+        to: "knitboxing@corazolana.com",
+        from: "no-reply@corazolana.com",
+        cc: orderData.customerEmail,
+        subject: "Pedido de KnitBoxing",
+        text: `Tienes un nuevo pedido de KnitBoxing de ${orderData.customerName}`,
+        html: htmlTemplate,
       });
+
+      console.log("\x1b[32m SUCCESS: Email enviado a knitboxing@corazolana.com y cliente! \x1b[0m");
       strapi.log.info(`[EMAIL] Correo enviado a ${orderData.customerEmail}`);
     } catch (error) {
+      console.log("\x1b[31m ERROR: email delivery failed! \x1b[0m");
       console.error("❌ Error enviando el correo:", error);
     }
   },
