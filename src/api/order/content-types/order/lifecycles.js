@@ -175,9 +175,9 @@ module.exports = {
     // 5) Enviar el correo
     try {
       await strapi.plugins["email"].services.email.send({
-        to: "knitboxingmx@gmail.com",
+        to: "knitboxing@corazolana.com",
         from: "no-reply@corazolana.com",
-        cc: `${orderData.customerEmail}, knitboxing@corazolana.com`,
+        cc: `${orderData.customerEmail}, knitboxingmx@gmail.com`,
         subject: "Pedido de KnitBoxing",
         text: `Tienes un nuevo pedido de KnitBoxing de ${orderData.customerName}`,
         html: htmlTemplate,
