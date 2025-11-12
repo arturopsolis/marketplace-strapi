@@ -19,7 +19,7 @@
     "@strapi/provider-email-sendgrid": "^5.15.0",
     "@strapi/provider-upload-local": "5.11.0",
     "@strapi/strapi": "5.11.0",
-    "cloudinary": "^2.6.1",
+    "cloudinary": "^2.8.0",
     "pg": "8.8.0",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
