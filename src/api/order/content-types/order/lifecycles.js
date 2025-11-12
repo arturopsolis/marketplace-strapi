@@ -179,11 +179,13 @@ module.exports = {
         from: "no-reply@corazolana.com",
         cc: [orderData.customerEmail, "knitboxingmx@gmail.com"],
         subject: "Pedido de KnitBoxing",
-        text: `Tienes un nuevo pedido de KnitBoxing de ${orderData.customerName}`,
+        text: `Tienes un nuevo pedido en KnitBoxing de ${orderData.customerName}`,
         html: htmlTemplate,
       });
 
-      console.log("\x1b[32m SUCCESS: Email enviado a knitboxing@corazolana.com y cliente! \x1b[0m");
+      console.log(
+        "\x1b[32m SUCCESS: Email enviado a knitboxing@corazolana.com y cliente! \x1b[0m",
+      );
       strapi.log.info(`[EMAIL] Correo enviado a ${orderData.customerEmail}`);
     } catch (error) {
       console.log("\x1b[31m ERROR: email delivery failed! \x1b[0m");
