@@ -461,6 +461,10 @@ export interface ApiOrderOrder extends Struct.CollectionTypeSchema {
       'oneToMany',
       'api::order-item.order-item'
     >;
+    orderStatus: Schema.Attribute.Enumeration<
+      ['pending', 'processing', 'shipped', 'delivered', 'cancelled']
+    > &
+      Schema.Attribute.DefaultTo<'pending'>;
     phoneNumber: Schema.Attribute.String;
     productItems: Schema.Attribute.JSON;
     publishedAt: Schema.Attribute.DateTime;
