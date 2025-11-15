@@ -49,12 +49,22 @@
       "type": "enumeration",
       "enum": [
         "pending",
+        "contacted",
         "processing",
         "shipped",
         "delivered",
         "cancelled"
       ],
       "default": "pending"
+    },
+    "attendedBy": {
+      "type": "enumeration",
+      "enum": [
+        "unassigned",
+        "alejandra",
+        "karen"
+      ],
+      "default": "unassigned"
     }
   }
 }

@@ -448,6 +448,10 @@ export interface ApiOrderOrder extends Struct.CollectionTypeSchema {
   };
   attributes: {
     address: Schema.Attribute.Text;
+    attendedBy: Schema.Attribute.Enumeration<
+      ['unassigned', 'alejandra', 'karen']
+    > &
+      Schema.Attribute.DefaultTo<'unassigned'>;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -462,7 +466,14 @@ export interface ApiOrderOrder extends Struct.CollectionTypeSchema {
       'api::order-item.order-item'
     >;
     orderStatus: Schema.Attribute.Enumeration<
-      ['pending', 'processing', 'shipped', 'delivered', 'cancelled']
+      [
+        'pending',
+        'contacted',
+        'processing',
+        'shipped',
+        'delivered',
+        'cancelled',
+      ]
     > &
       Schema.Attribute.DefaultTo<'pending'>;
     phoneNumber: Schema.Attribute.String;
