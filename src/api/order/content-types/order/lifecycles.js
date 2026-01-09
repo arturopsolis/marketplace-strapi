@@ -1,5 +1,7 @@
 // path: src/api/order/content-types/order/lifecycles.js
 
+const { Resend } = require("resend");
+
 module.exports = {
   async afterCreate(event) {
     // Función para formatear dinero con comas
@@ -172,24 +174,33 @@ module.exports = {
       </p>
     `;
 
-    // 5) Enviar el correo
+    // 5) Enviar el correo con Resend
     try {
-      await strapi.plugins["email"].services.email.send({
-        to: "knitboxing@corazolana.com",
+      // Inicializar Resend con la API key
+      const resend = new Resend(process.env.RESEND_API_KEY);
+
+      // Enviar email usando Resend
+      const { data, error } = await resend.emails.send({
         from: "no-reply@corazolana.com",
+        to: ["knitboxing@corazolana.com"],
         cc: [orderData.customerEmail, "knitboxingmx@gmail.com"],
         subject: "Pedido de KnitBoxing",
-        text: `Tienes un nuevo pedido en KnitBoxing de ${orderData.customerName}`,
         html: htmlTemplate,
       });
 
-      console.log(
-        "\x1b[32m SUCCESS: Email enviado a knitboxing@corazolana.com y cliente! \x1b[0m",
-      );
-      strapi.log.info(`[EMAIL] Correo enviado a ${orderData.customerEmail}`);
+      if (error) {
+        console.log("\x1b[31m ERROR: email delivery failed! \x1b[0m");
+        console.error("❌ Error enviando el correo con Resend:", error);
+      } else {
+        console.log(
+          "\x1b[32m SUCCESS: Email enviado a knitboxing@corazolana.com y cliente! \x1b[0m",
+        );
+        console.log("Email ID:", data.id);
+        strapi.log.info(`[EMAIL] Correo enviado a ${orderData.customerEmail}`);
+      }
     } catch (error) {
       console.log("\x1b[31m ERROR: email delivery failed! \x1b[0m");
-      console.error("❌ Error enviando el correo:", error);
+      console.error("❌ Excepción al enviar el correo:", error);
     }
   },
 };

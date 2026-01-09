@@ -18,7 +18,8 @@ module.exports = ({ env }) => ({
       },
     },
   }, */
-  email: {
+  // Email configuration disabled - now using Resend API directly in lifecycles
+  /* email: {
     config: {
       provider: "sendgrid",
       providerOptions: {
@@ -30,5 +31,5 @@ module.exports = ({ env }) => ({
         testAddress: "knitboxing@corazolana.com",
       },
     },
-  },
+  }, */
 });
